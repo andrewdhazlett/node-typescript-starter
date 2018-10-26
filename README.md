@@ -10,7 +10,6 @@ Features
 --------
 - [ts-express-decorator](https://github.com/Romakita/ts-express-decorators)
 - **Local authentication** using Email and Password
-- **Facebook authentication** for client side sdk integration
 - **JWT** token authentication
 - **Typescript**
 - **Swagger documentation**

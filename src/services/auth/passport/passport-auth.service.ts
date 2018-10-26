@@ -10,7 +10,7 @@ export class PassportAuthService {
         return new Promise((resolve, reject) => {
             passport.authenticate(strategy, {
                 session: false
-            }, (err, data) => {
+            }, (err: Error, data: AuthDto) => {
                 if (err) return reject(err);
 
                 resolve(data);

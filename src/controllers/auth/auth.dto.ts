@@ -1,10 +1,6 @@
 import { IsEmail, IsNotEmpty as Required, IsOptional, IsUrl, MinLength } from 'class-validator';
 import { JsonProperty } from 'ts-express-decorators';
 
-export class FacebookTokenAuthQueryDto {
-    access_token: string;
-}
-
 export class LocalLoginDto {
     @JsonProperty()
     @IsEmail()
@@ -35,9 +31,4 @@ export class SignupDto {
     @JsonProperty()
     @Required()
     lastName: string;
-
-    @JsonProperty()
-    @IsUrl()
-    @IsOptional()
-    picture?: string;
 }

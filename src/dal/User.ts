@@ -3,13 +3,8 @@ import { prop, Typegoose, InstanceType, arrayProp, instanceMethod, pre, ModelTyp
 import * as bcrypt from 'bcrypt-nodejs';
 import { UserRepositoryToken } from './token-constants';
 
-export enum AuthProviderEnum {
-    FACEBOOK = 'facebook'
-}
-
 export class AuthToken {
     @prop() accessToken: string;
-    @prop({ enum: AuthProviderEnum }) provider: AuthProviderEnum;
 }
 
 @pre<User>('save', preSaveHook)
@@ -30,12 +25,6 @@ export class User extends Typegoose {
     @JsonProperty()
     password?: string;
 
-    @prop()
-    @JsonProperty()
-    picture?: string;
-
-    // Providers data
-    @prop() facebook?: string;
     @arrayProp({ items: AuthToken }) tokens?: AuthToken[];
 
     @prop()
@@ -58,7 +47,7 @@ export class User extends Typegoose {
     }
 }
 
-async function preSaveHook(next) {
+async function preSaveHook(next: Function) {
     const user = this;
     if (!user.isModified('password')) return next();
 

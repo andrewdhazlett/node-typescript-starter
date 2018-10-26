@@ -61,7 +61,7 @@ export class Server extends ServerLoader {
         $log.info('Server started...');
     }
 
-    public $onServerInitError(err) {
+    public $onServerInitError(err: Error) {
         $log.error(err);
     }
 }

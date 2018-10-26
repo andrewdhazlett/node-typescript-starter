@@ -3,7 +3,7 @@ import * as moment from 'moment';
 
 import { Inject, Service } from 'ts-express-decorators';
 import { UserRepositoryToken } from '../../dal/token-constants';
-import { AuthProviderEnum, UserInstance, UserRepository } from '../../dal/User';
+import { UserInstance, UserRepository } from '../../dal/User';
 import { API_ERRORS } from '../../types/app.errors';
 import { MongoErrorCode } from '../../types/mongo';
 import { ApiError } from '../../utils/error';
@@ -19,7 +19,7 @@ export const TOKEN_EXP = DAY * 7;
 
 @Service()
 export class AuthService {
-    private USER_TOKEN_FIELDS = '_id email lastName firstName picture fullName';
+    private USER_TOKEN_FIELDS = '_id email lastName firstName fullName';
 
     constructor(
         @Inject(UserRepositoryToken) public userRepository: UserRepository,
@@ -63,7 +63,7 @@ export class AuthService {
         }
     }
 
-    async authenticateLocal(email: string, password: string): Promise<AuthDto>  {
+    async authenticateLocal(email: string, password: string): Promise<AuthDto> {
         const user = await this.userRepository.findOne({ email }, this.USER_TOKEN_FIELDS + ' password');
         if (!user) throw new ApiError(API_ERRORS.USER_NOT_FOUND);
         const isMatch = await user.matchPassword(password);
@@ -72,13 +72,13 @@ export class AuthService {
         return await this.generateToken(user);
     }
 
-    async authenticateStrategy(strategy: AUTH_STRATEGY, req: Request, res: Response, next: NextFunction): Promise<AuthDto>  {
+    async authenticateStrategy(strategy: AUTH_STRATEGY, req: Request, res: Response, next: NextFunction): Promise<AuthDto> {
         return await this.passportAuthService.strategyAuthenticate(strategy, req, res, next);
     }
 
     async validateToken(token: string) {
         try {
-            const payload = jwt.verify(token, process.env.SECRET);
+            const payload = jwt.verify(token, process.env.SECRET) as UserInstance;
 
             return await this.rehydrateUser(payload._id);
         } catch (e) {
@@ -86,26 +86,6 @@ export class AuthService {
 
             throw new ApiError(API_ERRORS.UNAUTHORIZED);
         }
-    }
-
-    /**
-     * Generate jwt token using provider id.
-     * If no user was found with the current providerId and email, it will be created.
-     *
-     * Valid jwt token is returned on every successful auth
-     * @param { IAuthProviders } provider
-     * @param { string } providerId
-     * @param { IAuthProviderProfileDto } profile
-     * @returns { Promise<AuthDto> }
-     */
-    async generateProviderToken(provider: AuthProviderEnum, providerId: string, profile: IAuthProviderProfileDto): Promise<AuthDto> {
-        const existingUser = await this.userRepository.findOne({
-            [provider]: providerId
-        });
-        if (existingUser) return await this.generateToken(existingUser);
-
-        const savedUser = await this.createUser(profile);
-        return await this.generateToken(savedUser);
     }
 
     private validateProfile(profile: IAuthProviderProfileDto) {
@@ -120,8 +100,7 @@ export class AuthService {
             _id: user._id,
             email: user.email,
             lastName: user.lastName,
-            firstName: user.firstName,
-            picture: user.picture
+            firstName: user.firstName
         } as any;
 
         return {

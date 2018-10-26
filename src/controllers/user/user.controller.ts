@@ -21,7 +21,6 @@ export class UserController {
 
     @Get('/auth-test')
     async authTest(@Req() req: IAppRequest): Promise<string> {
-
         return `hello ${req.user._id}`;
     }
 }

@@ -1,5 +1,6 @@
 import { Request } from 'express';
-import { IMiddleware, OverrideMiddleware, AuthenticatedMiddleware,
+import {
+    IMiddleware, OverrideMiddleware, AuthenticatedMiddleware,
     EndpointInfo, EndpointMetadata, Req
 } from 'ts-express-decorators';
 import { AuthService } from '../services/auth/auth.service';
@@ -7,7 +8,7 @@ import { API_ERRORS } from '../types/app.errors';
 import { ApiError } from '../utils/error';
 
 @OverrideMiddleware(AuthenticatedMiddleware)
-export class AuthMiddleware implements IMiddleware  {
+export class AuthMiddleware implements IMiddleware {
     constructor(
         private authService: AuthService
     ) {
@@ -24,8 +25,9 @@ export class AuthMiddleware implements IMiddleware  {
     private extractHeaderFromRequest(req: Request): string {
         const authHeader = req.headers.authorization;
 
-        if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
+        if (authHeader instanceof String && authHeader.split(' ')[0] === 'Bearer') {
             return authHeader.split(' ')[1];
         }
+        return '';
     }
 }
